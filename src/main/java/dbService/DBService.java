@@ -54,7 +54,6 @@ public class DBService {
         return configuration;
     }
 
-
     public UsersDataSet getUserById(long id) throws DBException {
         try {
             Session session = sessionFactory.openSession();
