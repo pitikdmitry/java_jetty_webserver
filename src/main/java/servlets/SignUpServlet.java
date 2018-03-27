@@ -1,20 +1,19 @@
 package servlets;
 
-import accounts.AccountService;
-import accounts.UserProfile;
-
-import javax.servlet.ServletException;
+import dbService.DBException;
+import dbService.DBService;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import java.io.IOException;
 
 public class SignUpServlet extends HttpServlet {
-    @SuppressWarnings({"FieldCanBeLocal", "UnusedDeclaration"}) //todo: remove after module 2 home work
+    @SuppressWarnings({"FieldCanBeLocal", "UnusedDeclaration"})
     private final AccountService accountService;
+    private final DBService dbService;
 
-    public SignUpServlet(AccountService accountService) {
+    public SignUpServlet(AccountService accountService, DBService dbService) {
         this.accountService = accountService;
+        this.dbService = dbService;
     }
 
     //sign up
@@ -35,9 +34,11 @@ public class SignUpServlet extends HttpServlet {
             return;
         }
 
-        UserProfile newUser = new UserProfile(login, password, login);
-        accountService.addNewUser(newUser);
-
+        try {
+            dbService.addUser(login, password);
+        } catch (DBException e) {
+            e.printStackTrace();
+        }
         response.setStatus(HttpServletResponse.SC_OK);
     }
 }
