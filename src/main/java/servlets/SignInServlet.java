@@ -1,7 +1,9 @@
 package servlets;
 
-import accounts.UserProfile;
 import com.google.gson.Gson;
+import dbService.DBException;
+import dbService.DBService;
+import dbService.datasets.UsersDataSet;
 
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
@@ -10,11 +12,11 @@ import java.io.IOException;
 
 public class SignInServlet extends HttpServlet {
     @SuppressWarnings({"FieldCanBeLocal", "UnusedDeclaration"}) //todo: remove after module 2 home work
-    private final AccountService accountService;
     private Gson gson = new Gson();
+    private final DBService dbService;
 
-    public SignInServlet(AccountService accountService) {
-        this.accountService = accountService;
+    public SignInServlet(DBService dbService) {
+        this.dbService = dbService;
     }
 
     //sign in
@@ -29,8 +31,15 @@ public class SignInServlet extends HttpServlet {
             return;
         }
 
-        UserProfile user = accountService.getUserByLogin(login);
-        if (user == null || !user.getPass().equals(password)) {
+        UsersDataSet user = null;
+        try {
+            user = dbService.getUserByName(login);
+        } catch (DBException e) {
+            response.setContentType("text/html;charset=utf-8");
+            response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+            e.printStackTrace();
+        }
+        if (user == null || !user.getPassword().equals(password)) {
             response.setContentType("text/html;charset=utf-8");
             response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
 

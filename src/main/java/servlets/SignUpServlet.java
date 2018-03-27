@@ -8,11 +8,9 @@ import javax.servlet.http.HttpServletResponse;
 
 public class SignUpServlet extends HttpServlet {
     @SuppressWarnings({"FieldCanBeLocal", "UnusedDeclaration"})
-    private final AccountService accountService;
     private final DBService dbService;
 
-    public SignUpServlet(AccountService accountService, DBService dbService) {
-        this.accountService = accountService;
+    public SignUpServlet(DBService dbService) {
         this.dbService = dbService;
     }
 
@@ -28,15 +26,11 @@ public class SignUpServlet extends HttpServlet {
             return;
         }
 
-        if (accountService.getUserByLogin(login) != null) {
-            response.setContentType("text/html;charset=utf-8");
-            response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
-            return;
-        }
-
         try {
             dbService.addUser(login, password);
         } catch (DBException e) {
+            response.setContentType("text/html;charset=utf-8");
+            response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
             e.printStackTrace();
         }
         response.setStatus(HttpServletResponse.SC_OK);
